@@ -13,7 +13,7 @@ GO
 CREATE TABLE Utilizatori (
     utilizator_id INT IDENTITY(1,1) PRIMARY KEY,
     nume_utilizator NVARCHAR(50) NOT NULL,
-    parola NVARCHAR(100) NOT NULL,
+    parola NVARCHAR(50) NOT NULL,
     tip_utilizator VARCHAR(20) NOT NULL CHECK (tip_utilizator IN ('admin', 'cashier')),
     activ BIT NOT NULL
 );
@@ -36,7 +36,7 @@ CREATE TABLE Produse (
     categorie_id INT NOT NULL,
     producator_id INT NOT NULL,
     nume_produs NVARCHAR(100) NOT NULL,
-    cod_de_bare NVARCHAR(50) NOT NULL,
+    cod_de_bare NVARCHAR(10) NOT NULL,
     activ BIT NOT NULL
 );
 
@@ -436,7 +436,6 @@ BEGIN
 END;
 GO
 
-
 CREATE PROCEDURE SelectMaxSumBonForDate
     @data_selectata DATETIME
 AS
@@ -597,7 +596,7 @@ END
 GO
 
 CREATE PROCEDURE VerificaExistaCodDeBareProdus
-    @cod_de_bare NVARCHAR(50),
+    @cod_de_bare NVARCHAR(10),
     @exista BIT OUTPUT
 AS
 BEGIN
@@ -614,3 +613,48 @@ BEGIN
     END
 END
 GO
+
+--Inserti pentru teste in baza de date
+
+-- Inserare date în tabelul Utilizatori
+INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ) VALUES ('persanu13', 'parola12', 'admin', 1);
+INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ) VALUES ('casier1', 'parola123', 'cashier', 1);
+INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ) VALUES ('admin2', 'password789', 'admin', 1);
+INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ) VALUES ('cashier2', 'password101', 'cashier', 1);
+
+-- Inserare date in tabelul Categorii
+INSERT INTO Categorii (nume_categorie, activ) VALUES ('Electronice', 1);
+INSERT INTO Categorii (nume_categorie, activ) VALUES ('Alimente', 1);
+INSERT INTO Categorii (nume_categorie, activ) VALUES ('Imbracaminte', 1);
+
+-- Inserare date in tabelul Producatori
+INSERT INTO Producatori (nume_producator, tara_origine, activ) VALUES ('Samsung', 'Coreea de Sud', 1);
+INSERT INTO Producatori (nume_producator, tara_origine, activ) VALUES ('Nestle', 'Elvetia', 1);
+INSERT INTO Producatori (nume_producator, tara_origine, activ) VALUES ('Nike', 'SUA', 1);
+
+-- Inserare date in tabelul Produse
+INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (1, 1, 'Televizor', '1234567890123', 1);
+INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (2, 2, 'Ciocolata', '2345678901234', 1);
+INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (3, 3, 'Pantofi sport', '3456789012345', 1);
+
+-- Inserare date in tabelul Stocuri
+INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pret_achizitie, pret_vanzare, activ) 
+VALUES (1, 50, '2024-01-01', '2025-01-01', 1000.00, 1500.00, 1);
+INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pret_achizitie, pret_vanzare, activ) 
+VALUES (2, 200, '2024-02-01', '2025-02-01', 2.00, 3.00, 1);
+INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pret_achizitie, pret_vanzare, activ) 
+VALUES (3, 100, '2024-03-01', '2025-03-01', 50.00, 100.00, 1);
+
+-- Inserare date in tabelul Bonuri
+INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_incasata, activ) 
+VALUES (1, 1001, '2024-04-01', 1500.00, 1);
+INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_incasata, activ) 
+VALUES (2, 1002, '2024-05-01', 600.00, 1);
+INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_incasata, activ) 
+VALUES (3, 1003, '2024-06-01', 5000.00, 1);
+
+-- Inserare date in tabelul BonProdus
+INSERT INTO BonProdus (bon_id, produs_id, cantitate, subtotal) VALUES (1, 1, 1, 1500.00);
+INSERT INTO BonProdus (bon_id, produs_id, cantitate, subtotal) VALUES (2, 2, 200, 600.00);
+INSERT INTO BonProdus (bon_id, produs_id, cantitate, subtotal) VALUES (3, 3, 50, 5000.00);
+
