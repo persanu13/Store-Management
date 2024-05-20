@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="Magazin2.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:views="clr-namespace:Magazin2.Views"
+             xmlns:vm="clr-namespace:Magazin2.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="350"
+             Width="350" Height="300">
+    <Border CornerRadius="5" Background="#F5F5F5">
+    <StackPanel Margin="35 25">
+        <TextBlock Text="Username" FontSize="20" FontFamily="/assets/fonts/#Inter" FontWeight="Medium"/>
+        <TextBox Text="{Binding UserName}" FontSize="20" FontFamily="/assets/fonts/#Inter"
+                 FontWeight="Medium" Padding="5"
+                 BorderBrush="Black"/>
+        <TextBlock Margin="0 22 0 0" Text="Password" FontSize="20" FontWeight="Medium"
+                   FontFamily="/assets/fonts/#Inter"/>
+            <PasswordBox x:Name="UserPassword" Padding="5" FontSize="20" BorderBrush="Black"  PasswordChar="*" 
+                         FontWeight="Medium" FontFamily="/assets/fonts/#Inter" Password=""/>
+            <TextBlock Text="Username or password was incorect" FontSize="13" Margin="0 2 0 0" Foreground="#FF2E63"
+                       Visibility="{Binding IncorectVsb}" FontWeight="SemiBold" FontFamily="/assets/fonts/#Inter" />
+
+            <Button BorderThickness="0" Background="#252A34" VerticalAlignment="Center" Foreground="#F5F5F5"
+                Content="LogIn" FontSize="25" FontWeight="Bold" FontFamily="/assets/fonts/#Inter" Height="45"
+                    Cursor="Hand" Margin="0 30" CommandParameter="{Binding ElementName=UserPassword}"
+                    Command="{Binding DataContext.LoginCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        </StackPanel>
+    </Border>
+</UserControl>

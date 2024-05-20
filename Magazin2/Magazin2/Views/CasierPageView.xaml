@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="Magazin2.Views.CasierPageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Magazin2.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="440" d:DesignWidth="960"
+             Width="960" Height="440"
+             Background="#F5F5F5">
+    <Canvas>
+        <DockPanel Canvas.Left="10" Canvas.Top="30">
+            <Canvas Width="200" Height="25">
+                <TextBox Height="25" VerticalContentAlignment="Center" Text="{Binding SearchValue, UpdateSourceTrigger=PropertyChanged}" Padding="2 0 25 0" FontSize="14" Width="200"/>
+                <Image Source="/assets/search.png" Height="18" Canvas.Top="3.5" Canvas.Right="5"/>
+            </Canvas>
+            <ComboBox ItemsSource="{Binding AllCategories, Mode=OneTime}" FontSize="12" FontWeight="Medium"
+                      FontFamily="/assets/fonts/#Inter" Width="150" Margin="20 0" VerticalContentAlignment="Center"
+                      SelectedItem="{Binding SelectedSearchCategorie}" DisplayMemberPath="NumeCategorie"/>
+            <ComboBox ItemsSource="{Binding AllProducatori, Mode=OneTime}" FontSize="12" FontWeight="Medium"
+                      FontFamily="/assets/fonts/#Inter" Width="150" Margin="0 0" VerticalContentAlignment="Center"
+                      SelectedItem="{Binding SelectedSearchProducator}" DisplayMemberPath="NumeProducator"/>
+        </DockPanel>
+
+        <Border Padding="10" CornerRadius="5" BorderThickness="1" BorderBrush="#252A34" Width="620"
+       Height="350" Canvas.Left="10" Canvas.Top="70">
+            <StackPanel>
+                <DockPanel HorizontalAlignment="Left" Margin="0 3">
+                    <TextBlock Text="name" Width="100" FontSize="12" FontWeight="Medium"/>
+                    <TextBlock Text="barcode" Width="100" FontSize="12" FontWeight="Medium"/>
+                    <TextBlock Text="category" Width="100" FontSize="12" FontWeight="Medium"/>
+                    <TextBlock Text="manufacturer" Width="100" FontSize="12" FontWeight="Medium"/>
+                    <TextBlock Text="expiration date" Width="100" FontSize="12" FontWeight="Medium"/>
+                    <TextBlock Text="quantiti:" Width="50" FontSize="12" FontWeight="Medium"/>
+                    <TextBox Width="30"/>
+                </DockPanel>
+                <Border BorderThickness="0.2" BorderBrush="Black"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto"  Height="300">
+                    <ItemsControl ItemsSource="{Binding ProdusList}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <DockPanel  Margin="0 3">
+                                        <TextBlock Text="{Binding NumeProdus}" Width="100" FontSize="12" />
+                                        <TextBlock Text="{Binding CodDeBare}" Width="100" FontSize="12" />
+                                        <TextBlock Text="{Binding Converter={StaticResource ProdusCategorieConverter}}" Width="100" FontSize="12" />
+                                        <TextBlock Text="{Binding Converter={StaticResource ProdusProducatorConverter}}" Width="100" FontSize="12" />
+                                        <DockPanel HorizontalAlignment="Right" Margin="2 0">
+                                            <Button  Style="{StaticResource ImageButtonStyle}" Width="20" CommandParameter="{Binding}"
+                                            Command="{Binding DataContext.PressUpdateCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
+                                                <Image Source="/assets/edit.png" Width="17"/>
+                                            </Button>
+                                            <Button Style="{StaticResource ImageButtonStyle}" Width="20" CommandParameter="{Binding}"
+                                            Command="{Binding DataContext.DeleteProdusCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
+                                                <Image Source="/assets/delete.png" Width="15"/>
+                                            </Button>
+                                        </DockPanel>
+                                    </DockPanel>
+                                    <Border BorderThickness="0.2" BorderBrush="Black"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+
+        <Border Padding="10" CornerRadius="5" BorderThickness="1" BorderBrush="#252A34" Width="300"
+                Height="350" Canvas.Left="645" Canvas.Top="70">
+            <StackPanel>
+               
+            </StackPanel>
+        </Border>
+    </Canvas>
+</UserControl>

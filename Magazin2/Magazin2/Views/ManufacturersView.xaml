@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="Magazin2.Views.ManufacturersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Magazin2.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="440" d:DesignWidth="780"
+             Width="780" Height="440" Background="#F5F5F5">
+    <Canvas>
+        <DockPanel Canvas.Left="10" Canvas.Top="30">
+            <Canvas Width="200" Height="25">
+                <TextBox Height="25" VerticalContentAlignment="Center" Text="{Binding SearchValue, UpdateSourceTrigger=PropertyChanged}" Padding="2 0 25 0" FontSize="14" Width="200"/>
+                <Image Source="/assets/search.png" Height="18" Canvas.Top="3.5" Canvas.Right="5"/>
+            </Canvas>
+            <ComboBox ItemsSource="{Binding Countries, Mode=OneTime}" FontSize="12" FontWeight="Medium"
+                      FontFamily="/assets/fonts/#Inter" Width="150" Margin="20 0" VerticalContentAlignment="Center"
+                      SelectedValue="{Binding SelectedSearchCountry}"/>
+
+
+        </DockPanel>
+
+        <Border Padding="10" CornerRadius="5" BorderThickness="1" BorderBrush="#252A34" Width="550"
+        Height="350" Canvas.Left="10" Canvas.Top="70">
+            <StackPanel>
+                <DockPanel HorizontalAlignment="Left" Margin="0 3">
+                    <TextBlock Text="name" Width="100" FontSize="12" FontWeight="Medium"/>
+                    <TextBlock Text="origin country" Width="100" FontSize="12" FontWeight="Medium"/>
+                </DockPanel>
+                <Border BorderThickness="0.2" BorderBrush="Black"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto"  Height="300">
+                    <ItemsControl ItemsSource="{Binding ProducatorList}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <DockPanel  Margin="0 3">
+                                        <TextBlock Text="{Binding NumeProducator}" Width="100" FontSize="12" />
+                                        <TextBlock Text="{Binding TaraOrigine}" Width="100" FontSize="12" />
+                                        <DockPanel HorizontalAlignment="Right" Margin="2 0">
+                                            <Button  Style="{StaticResource ImageButtonStyle}" Width="20" CommandParameter="{Binding}"
+                                             Command="{Binding DataContext.PressUpdateCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
+                                                <Image Source="/assets/edit.png" Width="17"/>
+                                            </Button>
+                                            <Button Style="{StaticResource ImageButtonStyle}" Width="20" CommandParameter="{Binding}"
+                                             Command="{Binding DataContext.DeleteProducatorCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
+                                                <Image Source="/assets/delete.png" Width="15"/>
+                                            </Button>
+                                        </DockPanel>
+                                    </DockPanel>
+                                    <Border BorderThickness="0.2" BorderBrush="Black"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+
+        <Border Padding="10" CornerRadius="5" BorderThickness="1" BorderBrush="#252A34" Width="180"
+ Height="350" Canvas.Left="580" Canvas.Top="70">
+            <StackPanel>
+                <TextBlock Text="{Binding CreateUpdate}" Foreground="#252A34" TextAlignment="Center" FontWeight="Bold" FontSize="20" Margin="0 0 0 10"/>
+                <TextBlock Text="Manufacturer name" FontWeight="Medium"  Foreground="#252A34"/>
+                <TextBox Text="{Binding ProducatorName}" MaxLength="50"/>
+                <TextBlock Text="Origin Country" FontWeight="Medium"  Foreground="#252A34" Margin="0 7 0 0"/>
+                <ComboBox ItemsSource="{Binding Countries, Mode=OneTime}"
+                          SelectedValue="{Binding SelectedCountry, Mode=TwoWay}"/>
+                <TextBlock Text="{Binding WrongMessage}" Foreground="#FF2E63" FontWeight="Medium" FontSize="10"  Margin="0 10 0 0"/>
+                <Button Content="{Binding CreateUpdate}" FontWeight="Bold" FontSize="15" Cursor="Hand" Margin="0 5 0 0"
+                Command="{Binding AddUpdateProducatorCommand}"  Foreground="#252A34"/>
+                <Button Content="Back to Create" FontWeight="Bold" FontSize="15" Cursor="Hand" Margin="0 5 0 0"
+                Command="{Binding BackToCreateCommand}" Visibility="{Binding BacktoCreate}"  Foreground="#252A34"/>
+            </StackPanel>
+        </Border>
+    </Canvas>
+</UserControl>

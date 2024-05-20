@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="Magazin2.Views.AdminPageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:views="clr-namespace:Magazin2.Views"
+             xmlns:vm="clr-namespace:Magazin2.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="440" d:DesignWidth="960"
+             Width="960" Height="440"
+             Background="#F5F5F5">
+    <DockPanel>
+        <StackPanel Background="#252A34" Width="180">
+            <RadioButton Margin="0 18" Style="{StaticResource MenuRadioButton}" Command="{Binding MenuButtonCommand}"
+                         Content="USERS" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" IsChecked="True"/>
+            <RadioButton Margin="0 18" Style="{StaticResource MenuRadioButton}" Command="{Binding MenuButtonCommand}"
+                         Content="PRODUCTS" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+            <RadioButton Margin="0 18" Style="{StaticResource MenuRadioButton}" Command="{Binding MenuButtonCommand}"
+                         Content="CATEGORIES" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+            <RadioButton Margin="0 18" Style="{StaticResource MenuRadioButton}" Command="{Binding MenuButtonCommand}"
+                         Content="MANUFACTURERS" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+            <RadioButton Margin="0 18" Style="{StaticResource MenuRadioButton}" Command="{Binding MenuButtonCommand}"
+                         Content="STOCKS" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+            <RadioButton Margin="0 18" Style="{StaticResource MenuRadioButton}" Command="{Binding MenuButtonCommand}"
+                         Content="RECEIPTS" CommandParameter="{Binding RelativeSource={RelativeSource Self}}"/>
+        </StackPanel>
+        <ContentControl Content="{Binding CurrentAdminView}"/>
+
+    </DockPanel>
+</UserControl>
