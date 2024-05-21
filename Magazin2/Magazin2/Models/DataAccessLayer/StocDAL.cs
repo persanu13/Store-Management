@@ -44,7 +44,7 @@ namespace Magazin2.Models.DataAccessLayer
             using (SqlConnection con = DbService.Connection)
             {
                 ObservableCollection<Stoc> result = new ObservableCollection<Stoc>();
-                SqlCommand cmd = new SqlCommand("CautaStocuri", con);
+                SqlCommand cmd = new SqlCommand("FiltreazaStocuri", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@produs_id", (object)produs?.ProdusID ?? DBNull.Value);
                 con.Open();
@@ -65,6 +65,39 @@ namespace Magazin2.Models.DataAccessLayer
                 return result;
             }
         }
+
+        public ObservableCollection<Stoc> SearchStocForCashier(string numeProdus,string codDeBare,
+            int? categorieId,int? producatorId,DateTime? dataExpirare)
+        {
+            using (SqlConnection con = DbService.Connection)
+            {
+                ObservableCollection<Stoc> result = new ObservableCollection<Stoc>();
+                SqlCommand cmd = new SqlCommand("FiltrareStocuriPentruCasier", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@nume_produs", (object)numeProdus ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@cod_de_bare", (object)codDeBare ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@categorie_id", (object)categorieId ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@producator_id", (object)producatorId ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@data_expirare", (object)dataExpirare ?? DBNull.Value);
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Stoc stoc = new Stoc();
+                    stoc.StocID = (int)(reader[0]);
+                    stoc.ProdusID = (int)(reader[1]);
+                    stoc.Cantitate = (int)(reader[2]);
+                    stoc.DataAprovizionare = (DateTime)reader[3];
+                    stoc.DataExpirare = (DateTime)reader[4];
+                    stoc.PretAchizitie = (double)reader[5];
+                    stoc.PretVanzare = (double)reader[6];
+                    result.Add(stoc);
+                }
+                reader.Close();
+                return result;
+            }
+        }
+
         public Produs GetProductForStoc(Stoc stoc)
         {
             using (SqlConnection con = DbService.Connection)
@@ -117,6 +150,19 @@ namespace Magazin2.Models.DataAccessLayer
                 SqlCommand cmd = new SqlCommand("StergereLogicaStoc", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@stoc_id", stoc.StocID);
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        public void UpdateQuantityStoc(Stoc stoc)
+        {
+            using (SqlConnection con = DbService.Connection)
+            {
+                MessageBox.Show(stoc.Cantitate.ToString());
+                SqlCommand cmd = new SqlCommand("ActualizareCantitateStoc", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@stoc_id", stoc.StocID);
+                cmd.Parameters.AddWithValue("@cantitate", stoc.Cantitate);
                 con.Open();
                 cmd.ExecuteNonQuery();
             }

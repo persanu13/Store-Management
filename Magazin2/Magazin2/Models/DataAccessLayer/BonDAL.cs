@@ -8,6 +8,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Magazin2.Models.DataAccessLayer
 {
@@ -52,12 +53,12 @@ namespace Magazin2.Models.DataAccessLayer
                 return (string)numeUtilizatorParam.Value;
             }
         }
-        public List<BonProdus> GetReceiptDetails(Bon bon)
+        public ObservableCollection<BonProdus> GetReceiptDetails(Bon bon)
         {
             using (SqlConnection con = DbService.Connection)
             {
                 SqlCommand cmd = new SqlCommand("SelectDetaliBon", con);
-                List<BonProdus> result = new List<BonProdus>();
+                ObservableCollection<BonProdus> result = new ObservableCollection<BonProdus>();
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@bon_id", bon.BonID);
                 con.Open();
@@ -75,6 +76,45 @@ namespace Magazin2.Models.DataAccessLayer
                 return result;
             }
         }
+        public void AddBon(Bon bon)
+        {
+            using (SqlConnection con = DbService.Connection)
+            {
+                SqlCommand cmd = new SqlCommand("AdaugaBon", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlParameter utilizatorIdParam = new SqlParameter("@utilizator_id", bon.UtilizatorID);
+                SqlParameter numarBonIdParam = new SqlParameter("@numar_bon", bon.NumarBon);
+                SqlParameter dataEliberareParam = new SqlParameter("@data_eliberare", bon.DataEliberare);
+                SqlParameter sumaTotalaParam = new SqlParameter("@suma_totala", bon.SumaTotala);
+                SqlParameter bonIdParam = new SqlParameter("@bon_id", SqlDbType.Int);
+                bonIdParam.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(utilizatorIdParam);
+                cmd.Parameters.Add(numarBonIdParam);
+                cmd.Parameters.Add(dataEliberareParam);
+                cmd.Parameters.Add(sumaTotalaParam);
+                cmd.Parameters.Add(bonIdParam);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                bon.BonID = bonIdParam.Value as int?;
+            }
+        }
+
+        public void AddBonProdus(BonProdus bonProdus)
+        {
+            using (SqlConnection con = DbService.Connection)
+            {
+                SqlCommand cmd = new SqlCommand("AdaugaBonProdus", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@bon_id", bonProdus.BonID);
+                cmd.Parameters.AddWithValue("@produs_id", bonProdus.ProdusID);
+                cmd.Parameters.AddWithValue("@cantitate", bonProdus.Cantitate);
+                cmd.Parameters.AddWithValue("@subtotal", bonProdus.SubTotal);
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
         public void DeleteBon(Bon bon)
         {
             using (SqlConnection con = DbService.Connection)
@@ -108,6 +148,22 @@ namespace Magazin2.Models.DataAccessLayer
                 return bon;
             }
         }
+        public int GetBonNumberToday()
+        {
+            using (SqlConnection con = DbService.Connection)
+            {
+                SqlCommand cmd = new SqlCommand("SelectNumarBonuriCreateAstazi", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlParameter numarBonuriParam = new SqlParameter("@numar_bonuri", SqlDbType.Int);
+                numarBonuriParam.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(numarBonuriParam);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                return (int)numarBonuriParam.Value;
+            }
+        }
+        
+
 
 
     }

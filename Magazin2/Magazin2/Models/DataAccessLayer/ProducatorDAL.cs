@@ -40,7 +40,7 @@ namespace Magazin2.Models.DataAccessLayer
             using (SqlConnection con = DbService.Connection)
             {
                 ObservableCollection<Producator> result = new ObservableCollection<Producator>();
-                SqlCommand cmd = new SqlCommand("CautaProducatori", con);
+                SqlCommand cmd = new SqlCommand("FiltreazaProducatori", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlParameter sirParam = new SqlParameter("@sir_caractere", sir);
                 SqlParameter originCountryParam = new SqlParameter();
@@ -125,7 +125,7 @@ namespace Magazin2.Models.DataAccessLayer
         {
             using (SqlConnection con = DbService.Connection)
             {
-                SqlCommand cmd = new SqlCommand("ExistaProducator", con);
+                SqlCommand cmd = new SqlCommand("VerificaExistaNumeProducator", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlParameter numeProducatorParam = new SqlParameter("@nume_producator", producatorName);
                 SqlParameter existaParam = new SqlParameter("@exista", SqlDbType.Bit);

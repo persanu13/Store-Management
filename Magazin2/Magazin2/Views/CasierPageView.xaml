@@ -4,22 +4,37 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Magazin2.Views"
+             xmlns:converter="clr-namespace:Magazin2.Converts"
              mc:Ignorable="d" 
              d:DesignHeight="440" d:DesignWidth="960"
              Width="960" Height="440"
              Background="#F5F5F5">
+    <UserControl.Resources>
+        <converter:StocProdusConverter x:Key="StocProdusConverter"/>
+        <converter:BonProdusProdusConverter x:Key="BonProdusProdusConverter"/>
+    </UserControl.Resources>
     <Canvas>
+        <DockPanel Canvas.Left="10" Canvas.Top="10">
+            <TextBlock Text="Product name" Width="135" FontSize="12" FontWeight="Medium"/>
+            <TextBlock Text="Product barcode" Width="100" FontSize="12" FontWeight="Medium" Margin="10 0"/>
+            <TextBlock Text="Product category" Width="120" FontSize="12" FontWeight="Medium" />
+            <TextBlock Text="Prodoct manufacturer" Width="120" FontSize="12" FontWeight="Medium" Margin="10 0"/>
+            <TextBlock Text="Expiration date" Width="100" FontSize="12" FontWeight="Medium"/>
+        </DockPanel>
         <DockPanel Canvas.Left="10" Canvas.Top="30">
-            <Canvas Width="200" Height="25">
-                <TextBox Height="25" VerticalContentAlignment="Center" Text="{Binding SearchValue, UpdateSourceTrigger=PropertyChanged}" Padding="2 0 25 0" FontSize="14" Width="200"/>
-                <Image Source="/assets/search.png" Height="18" Canvas.Top="3.5" Canvas.Right="5"/>
-            </Canvas>
+            <TextBox Height="25" VerticalContentAlignment="Center" Text="{Binding ProdusName, UpdateSourceTrigger=PropertyChanged}"
+                     Padding="2 0" FontSize="14" Width="135"/>
+            <TextBox Height="25" VerticalContentAlignment="Center" Text="{Binding BarCode, UpdateSourceTrigger=PropertyChanged}"
+                     Padding="2 0" FontSize="14" Width="100" Margin="10 0"/>
+               
             <ComboBox ItemsSource="{Binding AllCategories, Mode=OneTime}" FontSize="12" FontWeight="Medium"
-                      FontFamily="/assets/fonts/#Inter" Width="150" Margin="20 0" VerticalContentAlignment="Center"
-                      SelectedItem="{Binding SelectedSearchCategorie}" DisplayMemberPath="NumeCategorie"/>
+                      FontFamily="/assets/fonts/#Inter" Width="120" Margin="0" VerticalContentAlignment="Center"
+                      SelectedItem="{Binding SelectedCategorie}" DisplayMemberPath="NumeCategorie"/>
             <ComboBox ItemsSource="{Binding AllProducatori, Mode=OneTime}" FontSize="12" FontWeight="Medium"
-                      FontFamily="/assets/fonts/#Inter" Width="150" Margin="0 0" VerticalContentAlignment="Center"
-                      SelectedItem="{Binding SelectedSearchProducator}" DisplayMemberPath="NumeProducator"/>
+                      FontFamily="/assets/fonts/#Inter" Width="120" Margin="10 0" VerticalContentAlignment="Center"
+                      SelectedItem="{Binding SelectedProducator}" DisplayMemberPath="NumeProducator"/>
+            <DatePicker SelectedDate="{Binding SelectedDate}" IsEnabled="{Binding DateEnable}"/>
+            <CheckBox IsChecked="{Binding DateEnable}" VerticalAlignment="Center"/>
         </DockPanel>
 
         <Border Padding="10" CornerRadius="5" BorderThickness="1" BorderBrush="#252A34" Width="620"
@@ -32,27 +47,24 @@
                     <TextBlock Text="manufacturer" Width="100" FontSize="12" FontWeight="Medium"/>
                     <TextBlock Text="expiration date" Width="100" FontSize="12" FontWeight="Medium"/>
                     <TextBlock Text="quantiti:" Width="50" FontSize="12" FontWeight="Medium"/>
-                    <TextBox Width="30"/>
+                    <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="40" FontSize="12" FontWeight="Medium"/>
                 </DockPanel>
                 <Border BorderThickness="0.2" BorderBrush="Black"/>
                 <ScrollViewer VerticalScrollBarVisibility="Auto"  Height="300">
-                    <ItemsControl ItemsSource="{Binding ProdusList}">
+                    <ItemsControl ItemsSource="{Binding StocList}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
                                     <DockPanel  Margin="0 3">
-                                        <TextBlock Text="{Binding NumeProdus}" Width="100" FontSize="12" />
-                                        <TextBlock Text="{Binding CodDeBare}" Width="100" FontSize="12" />
-                                        <TextBlock Text="{Binding Converter={StaticResource ProdusCategorieConverter}}" Width="100" FontSize="12" />
-                                        <TextBlock Text="{Binding Converter={StaticResource ProdusProducatorConverter}}" Width="100" FontSize="12" />
+                                        <TextBlock Text="{Binding Converter={StaticResource StocProdusConverter}, ConverterParameter='NumeProdus'}"  Width="100" FontSize="12"/>
+                                        <TextBlock Text="{Binding Converter={StaticResource StocProdusConverter}, ConverterParameter='CodDeBare'}"  Width="100" FontSize="12"/>
+                                        <TextBlock Text="{Binding Converter={StaticResource StocProdusConverter}, ConverterParameter='Categorie'}"  Width="100" FontSize="12"/>
+                                        <TextBlock Text="{Binding Converter={StaticResource StocProdusConverter}, ConverterParameter='Producator'}"  Width="100" FontSize="12"/>
+                                        <TextBlock Text="{Binding DataExpirare,StringFormat=d}" Width="100" FontSize="12" />
                                         <DockPanel HorizontalAlignment="Right" Margin="2 0">
-                                            <Button  Style="{StaticResource ImageButtonStyle}" Width="20" CommandParameter="{Binding}"
-                                            Command="{Binding DataContext.PressUpdateCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
-                                                <Image Source="/assets/edit.png" Width="17"/>
-                                            </Button>
-                                            <Button Style="{StaticResource ImageButtonStyle}" Width="20" CommandParameter="{Binding}"
-                                            Command="{Binding DataContext.DeleteProdusCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
-                                                <Image Source="/assets/delete.png" Width="15"/>
+                                            <Button  Style="{StaticResource ImageButtonStyle}" Margin="0 0 12 0" Width="22" HorizontalAlignment="Center" CommandParameter="{Binding}"
+                                            Command="{Binding DataContext.PressPlusCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
+                                                <Image Source="/assets/plus.png" Width="18"/>
                                             </Button>
                                         </DockPanel>
                                     </DockPanel>
@@ -68,7 +80,48 @@
         <Border Padding="10" CornerRadius="5" BorderThickness="1" BorderBrush="#252A34" Width="300"
                 Height="350" Canvas.Left="645" Canvas.Top="70">
             <StackPanel>
-               
+                <TextBlock Text="Receipt Details" Foreground="#252A34" TextAlignment="Center" FontWeight="Bold" FontSize="20" Margin="0 0 0 10"/>
+                <TextBlock  FontSize="12" FontWeight="Medium" FontFamily="/assets/fonts/#Inter" Margin="0 2">
+     <Run Text="Receipts number: "/>
+     <Run Text="{Binding CreatedBon.NumarBon}"/>
+                </TextBlock>
+                <TextBlock Text="Product List"  FontSize="15" FontWeight="Medium" FontFamily="/assets/fonts/#Inter" Margin="0 4"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto"  Height="190" Margin="0 5">
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding CreatedBon.ListaProduse}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <TextBlock Width="169" FontWeight="Medium">
+                                            <Run Text="{Binding Cantitate}"/>
+                                            <Run Text="x"/>
+                                            <Run Text="{Binding Converter={StaticResource BonProdusProdusConverter}, Mode=OneWay}"/>
+                                            <Run Text="............................................................................................................................."/>
+                                        </TextBlock>
+                                        <DockPanel Width="60">
+                                            <TextBlock Text="{Binding SubTotal, StringFormat={}{0:F2}}" FontWeight="Medium" Margin="4 0 0 0"/>
+                                        <TextBlock Text="$" FontWeight="Medium"/>
+                                        </DockPanel>
+                                        <Button  Style="{StaticResource ImageButtonStyle}" Margin="0 0 12 0" Width="22" HorizontalAlignment="Center" CommandParameter="{Binding}"
+                                                 Command="{Binding DataContext.PressMinusCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
+                                            <Image Source="/assets/minus.png" Width="18"/>
+                                        </Button>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <DockPanel>
+                            <TextBlock Width="169" FontWeight="Medium">
+                            <Run Text="Total"/>
+                            <Run Text="........................................................................................................................."/>
+                            </TextBlock>
+                            <TextBlock Text="{Binding CreatedBon.SumaTotala, StringFormat={}{0:F2}}" FontWeight="Medium" Margin="4 0 0 0"/>
+                            <TextBlock Text="$" FontWeight="Medium"/>
+                        </DockPanel>
+                    </StackPanel>
+                </ScrollViewer>
+                <Button Content="OK" FontWeight="Bold" FontSize="20" Cursor="Hand" Margin="0 5 0 0" Width="100" Height="35"
+                        Command="{Binding PressOkCommand}" Foreground="#252A34"/>
             </StackPanel>
         </Border>
     </Canvas>

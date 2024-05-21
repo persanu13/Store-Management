@@ -70,7 +70,7 @@ namespace Magazin2.Models.DataAccessLayer
                 SqlCommand cmd = new SqlCommand("SelectNumeCategorie", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlParameter produsIdParam = new SqlParameter("@produs_id",  produs.ProdusID);
-                SqlParameter numeCategorieParam = new SqlParameter("@nume_categorie", SqlDbType.NVarChar, 50);
+                SqlParameter numeCategorieParam = new SqlParameter("@nume_categorie", SqlDbType.NVarChar, 10);
                 numeCategorieParam.Direction = ParameterDirection.Output;
                 cmd.Parameters.Add(produsIdParam);
                 cmd.Parameters.Add(numeCategorieParam);
@@ -117,16 +117,20 @@ namespace Magazin2.Models.DataAccessLayer
                 produs.ProdusID = produsIdParam.Value as int?;
             }
         }
-        public void DeleteProdus(Produs produs)
+        public bool DeleteProdus(Produs produs)
         {
             using (SqlConnection con = DbService.Connection)
             {
                 SqlCommand cmd = new SqlCommand("StergereLogicaProdus", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlParameter produsIdParam = new SqlParameter("@produs_id", produs.ProdusID);
+                SqlParameter resultParam = new SqlParameter("@result", SqlDbType.Bit);
+                resultParam.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(resultParam);
                 cmd.Parameters.Add(produsIdParam);
                 con.Open();
                 cmd.ExecuteNonQuery();
+                return (bool)resultParam.Value;
             }
         }
         public void UpdateProdus(Produs produs)
@@ -149,7 +153,7 @@ namespace Magazin2.Models.DataAccessLayer
         {
             using (SqlConnection con = DbService.Connection)
             {
-                SqlCommand cmd = new SqlCommand("ExistaProdus", con);
+                SqlCommand cmd = new SqlCommand("VerificaExistaCodDeBareProdus", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@cod_de_bare", codDeBare);
                 SqlParameter existaParam = new SqlParameter("@exista", SqlDbType.Bit)

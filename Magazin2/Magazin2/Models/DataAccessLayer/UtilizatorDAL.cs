@@ -42,7 +42,7 @@ namespace Magazin2.Models.DataAccessLayer
             using (SqlConnection con = DbService.Connection)
             {
                 ObservableCollection<Utilizator> result = new ObservableCollection<Utilizator>();
-                SqlCommand cmd = new SqlCommand("CautaUtilizatori", con);
+                SqlCommand cmd = new SqlCommand("FiltreazaUtilizatori", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlParameter sirParam = new SqlParameter("@sir_caractere", sir);
                 SqlParameter tipUtilizatorParam = new SqlParameter();

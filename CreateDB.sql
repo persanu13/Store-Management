@@ -56,7 +56,7 @@ CREATE TABLE Bonuri (
     utilizator_id INT NOT NULL,
 	numar_bon INT NOT NULL,
     data_eliberare DATETIME NOT NULL,
-    suma_incasata FLOAT NOT NULL,
+    suma_totala FLOAT NOT NULL,
     activ BIT NOT NULL
 );
 
@@ -158,6 +158,32 @@ BEGIN
 END
 GO
 
+CREATE PROCEDURE AdaugaBon
+    @utilizator_id INT,
+    @numar_bon INT,
+    @data_eliberare DATETIME,
+    @suma_totala FLOAT,
+    @bon_id INT OUTPUT
+AS
+BEGIN
+    INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_totala, activ)
+    VALUES (@utilizator_id, @numar_bon, @data_eliberare, @suma_totala, 1);
+    SET @bon_id = SCOPE_IDENTITY();
+END;
+GO
+
+CREATE PROCEDURE AdaugaBonProdus
+    @bon_id INT,
+    @produs_id INT,
+    @cantitate INT,
+    @subtotal FLOAT
+AS
+BEGIN
+    INSERT INTO BonProdus (bon_id, produs_id, cantitate, subtotal)
+    VALUES (@bon_id, @produs_id, @cantitate, @subtotal);
+END;
+GO
+
 --Proceduri Stocate Pentru Stergere Logica
 
 CREATE PROCEDURE StergereLogicaUtilizator
@@ -249,6 +275,16 @@ BEGIN
 END
 GO
 
+CREATE PROCEDURE StergereLogicaBon
+    @bon_id INT
+AS
+BEGIN
+    UPDATE Bonuri
+    SET activ = 0
+    WHERE bon_id = @bon_id;
+END;
+GO
+
 --Proceduri Stocate Pentru Actualizari
 
 CREATE PROCEDURE ActualizeazaUtilizator
@@ -298,8 +334,6 @@ CREATE PROCEDURE ActualizeazaProdus
     @cod_de_bare NVARCHAR(50)
 AS
 BEGIN
-    SET NOCOUNT ON;
-
     UPDATE Produse
     SET
         categorie_id = @categorie_id,
@@ -317,7 +351,8 @@ AS
 BEGIN
     UPDATE Stocuri
     SET 
-        cantitate = @cantitate
+        cantitate = @cantitate,
+		activ = CASE WHEN @cantitate = 0 THEN 0 ELSE activ END
     WHERE 
         stoc_id = @stoc_id;
 END
@@ -405,6 +440,17 @@ BEGIN
 END
 GO
 
+CREATE PROCEDURE SelectProdusStoc
+    @stoc_id INT
+AS
+BEGIN
+    SELECT p.*
+    FROM Stocuri s
+    INNER JOIN Produse p ON s.produs_id = p.produs_id
+    WHERE s.stoc_id = @stoc_id;
+END;
+GO
+
 CREATE PROCEDURE SelectBonuri
 AS
 BEGIN
@@ -443,14 +489,26 @@ BEGIN
     SELECT TOP 1 *
     FROM Bonuri
     WHERE CAST(data_eliberare AS DATE) = CAST(@data_selectata AS DATE) AND activ = 1
-    ORDER BY suma_incasata DESC;
+    ORDER BY suma_totala DESC;
+END;
+GO
+
+CREATE PROCEDURE SelectNumarBonuriCreateAstazi
+    @numar_bonuri INT OUTPUT
+AS
+BEGIN
+    DECLARE @data_curenta DATE;
+    SET @data_curenta = CAST(GETDATE() AS DATE);
+    SELECT @numar_bonuri = COUNT(*)
+    FROM Bonuri
+    WHERE CAST(data_eliberare AS DATE) = @data_curenta;
 END;
 GO
 
 --Proceduri Stocate Pentru Filtrari
 
 CREATE PROCEDURE FiltreazaUtilizatori
-    @sir_caractere NVARCHAR(100),
+    @sir_caractere NVARCHAR(50),
     @tip_utilizator VARCHAR(20) = NULL
 AS
 BEGIN
@@ -536,6 +594,57 @@ BEGIN
     SELECT * FROM Stocuri
 	WHERE activ = 1 AND 
 	(@produs_id IS NULL OR produs_id = @produs_id);
+END
+GO
+
+CREATE PROCEDURE FiltrareStocuriPentruCasier
+    @nume_produs NVARCHAR(100) = NULL,
+    @cod_de_bare NVARCHAR(10) = NULL,
+    @categorie_id INT = NULL,
+    @producator_id INT = NULL,
+    @data_expirare DATETIME = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    ;WITH FilteredStocks AS (
+        SELECT 
+            s.stoc_id,
+            s.produs_id,
+            s.cantitate,
+            s.data_aprovizionare,
+            s.data_expirare,
+            s.pret_achizitie,
+            s.pret_vanzare,
+            s.activ,
+            p.nume_produs,
+            p.cod_de_bare,
+            p.categorie_id,
+            p.producator_id,
+            ROW_NUMBER() OVER (PARTITION BY s.produs_id ORDER BY s.data_aprovizionare) AS rn
+        FROM 
+            Stocuri s
+            INNER JOIN Produse p ON s.produs_id = p.produs_id
+        WHERE 
+            s.activ = 1
+            AND (@nume_produs IS NULL OR p.nume_produs LIKE '%' + @nume_produs + '%')
+            AND (@cod_de_bare IS NULL OR p.cod_de_bare LIKE @cod_de_bare + '%')
+            AND (@categorie_id IS NULL OR p.categorie_id = @categorie_id)
+            AND (@producator_id  IS NULL OR p.producator_id = @producator_id )
+            AND (@data_expirare IS NULL OR s.data_expirare = @data_expirare)
+    )
+    SELECT 
+        stoc_id,
+        produs_id,
+        cantitate,
+        data_aprovizionare,
+        data_expirare,
+        pret_achizitie,
+        pret_vanzare
+    FROM 
+        FilteredStocks
+    WHERE 
+        rn = 1;
 END
 GO
 
@@ -633,9 +742,9 @@ INSERT INTO Producatori (nume_producator, tara_origine, activ) VALUES ('Nestle',
 INSERT INTO Producatori (nume_producator, tara_origine, activ) VALUES ('Nike', 'SUA', 1);
 
 -- Inserare date in tabelul Produse
-INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (1, 1, 'Televizor', '1234567890123', 1);
-INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (2, 2, 'Ciocolata', '2345678901234', 1);
-INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (3, 3, 'Pantofi sport', '3456789012345', 1);
+INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (1, 1, 'Televizor', '1234567890', 1);
+INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (2, 2, 'Ciocolata', '2345678901', 1);
+INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (3, 3, 'Pantofi sport', '3456789012', 1);
 
 -- Inserare date in tabelul Stocuri
 INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pret_achizitie, pret_vanzare, activ) 
@@ -646,11 +755,11 @@ INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pr
 VALUES (3, 100, '2024-03-01', '2025-03-01', 50.00, 100.00, 1);
 
 -- Inserare date in tabelul Bonuri
-INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_incasata, activ) 
+INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_totala, activ) 
 VALUES (1, 1001, '2024-04-01', 1500.00, 1);
-INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_incasata, activ) 
+INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_totala, activ) 
 VALUES (2, 1002, '2024-05-01', 600.00, 1);
-INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_incasata, activ) 
+INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_totala, activ) 
 VALUES (3, 1003, '2024-06-01', 5000.00, 1);
 
 -- Inserare date in tabelul BonProdus

@@ -5,7 +5,7 @@ namespace Magazin2.Services
 {
     public class DbService
     {
-        private static readonly string connectionString = "Data Source=STEMI-MACHINE;Initial Catalog=MagazinDB;Integrated Security=SSPI;";
+        private static readonly string connectionString = "Data Source=STEMI-MACHINE;Initial Catalog=Magazin2DB;Integrated Security=SSPI;";
         public static SqlConnection Connection
         {
             get

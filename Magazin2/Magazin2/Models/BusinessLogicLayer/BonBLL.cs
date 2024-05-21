@@ -6,35 +6,48 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Magazin2.Models.BusinessLogicLayer
 {
     public class BonBLL
     {
-        private BonDAL bonDal = new BonDAL();
+        private BonDAL bonDAL = new BonDAL();
 
         public ObservableCollection<Bon> GetAllBonuri()
         {
-            return bonDal.GetAllBonuri();   
+            return bonDAL.GetAllBonuri();   
         }
         public string GetUserName(Bon bon)
         {
-            return bonDal.GetUserName(bon);
+            return bonDAL.GetUserName(bon);
         }
-        public List<BonProdus> GetReceiptDetails(Bon bon)
+        public ObservableCollection<BonProdus> GetReceiptDetails(Bon bon)
         {
-            return bonDal.GetReceiptDetails(bon);
+            return bonDAL.GetReceiptDetails(bon);
+        }
+        public void AddBon(Bon bon)
+        {
+            bonDAL.AddBon(bon);
+            foreach(BonProdus bonProdus in bon.ListaProduse)
+            {
+                bonProdus.BonID = bon.BonID;
+                bonDAL.AddBonProdus(bonProdus);
+            }
         }
         public void DeleteBon(Bon bon)
         {
-            bonDal.DeleteBon(bon);
+            bonDAL.DeleteBon(bon);
         }
         public Bon MaxBon(DateTime date)
         {
-            return bonDal.MaxBon(date);
+            return bonDAL.MaxBon(date);
+        }
+        public int GetBonNumberToday()
+        {
+            return bonDAL.GetBonNumberToday();
         }
 
 
-
-        }
+    }
 }

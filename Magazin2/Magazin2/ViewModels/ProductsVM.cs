@@ -184,7 +184,7 @@ namespace Magazin2.ViewModels
             }
             else
             {
-                newProdus.ProdusID = updatedProdus.ProducatorID;
+                newProdus.ProdusID = updatedProdus.ProdusID;
                 produsBLL.UpdateProdus(newProdus);
                 BackToCreate(null);
             }

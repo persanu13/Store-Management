@@ -24,11 +24,19 @@ namespace Magazin2.Models.BusinessLogicLayer
         {
             return stocDAL.SearchStoc(produs);
         }
+        public ObservableCollection<Stoc> SearchStocForCashier(string numeProdus, string codDeBare,
+           int? categorieId, int? producatorId, DateTime? dataExpirare)
+        {
+            return stocDAL.SearchStocForCashier(numeProdus, codDeBare, categorieId, producatorId, dataExpirare);
+        }
         public void AddStoc(Stoc stoc)
         {
             stocDAL.AddStoc(stoc);
         }
-
+        public void UpdateQuantityStoc(Stoc stoc)
+        {
+            stocDAL.UpdateQuantityStoc(stoc);
+        }
 
     }
 }

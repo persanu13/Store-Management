@@ -25,7 +25,7 @@
          <Run Text="Cashie name: "/>
          <Run Text="{Binding ThisBon, Converter={StaticResource BonUtilizatorConverter},Mode=OneWay}"/>
         </TextBlock>
-        <TextBlock Text="Product:"  FontSize="15" FontWeight="Medium" FontFamily="/assets/fonts/#Inter" Margin="0 4"/>
+        <TextBlock Text="Product List"  FontSize="15" FontWeight="Medium" FontFamily="/assets/fonts/#Inter" Margin="0 4"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto"  Height="360" Margin="0 5">
             <StackPanel>
                 <ItemsControl ItemsSource="{Binding ThisBon.ListaProduse}">
@@ -34,7 +34,7 @@
                         <DockPanel>
                             <TextBlock Text ="{Binding Cantitate}" FontWeight="Medium"/>
                             <TextBlock Text=" x " FontWeight="Medium"/>
-                            <TextBlock Width="219" FontWeight="Medium">
+                            <TextBlock Width="199" FontWeight="Medium">
                                 <Run Text="{Binding Converter={StaticResource BonProdusProdusConverter}, Mode=OneWay}"/>
                                 <Run Text="............................................................................................................................."/>
                             </TextBlock>
@@ -45,7 +45,7 @@
                 </ItemsControl.ItemTemplate>
                 </ItemsControl>
                  <DockPanel>
-                    <TextBlock Width="239" FontWeight="Medium">
+                    <TextBlock Width="219" FontWeight="Medium">
                             <Run Text="Total"/>
                             <Run Text="........................................................................................................................."/>
                     </TextBlock>

@@ -38,7 +38,7 @@ namespace Magazin2.Models.DataAccessLayer
             using (SqlConnection con = DbService.Connection)
             {
                 ObservableCollection<Categorie> result = new ObservableCollection<Categorie>();
-                SqlCommand cmd = new SqlCommand("CautaCategorie", con);
+                SqlCommand cmd = new SqlCommand("FiltreazaCategorii", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlParameter sirParam = new SqlParameter("@sir_caractere", sir);
                 cmd.Parameters.Add(sirParam);
@@ -106,7 +106,7 @@ namespace Magazin2.Models.DataAccessLayer
         {
             using (SqlConnection con = DbService.Connection)
             {
-                SqlCommand cmd = new SqlCommand("ExistaCategorie", con);
+                SqlCommand cmd = new SqlCommand("VerificaExistaNumeCategorie", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlParameter numeCategorieParam = new SqlParameter("@nume_categorie", categorieName);
                 SqlParameter existaParam = new SqlParameter("@exista", SqlDbType.Bit);

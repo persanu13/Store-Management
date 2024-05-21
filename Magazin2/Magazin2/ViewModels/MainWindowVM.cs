@@ -53,32 +53,32 @@ namespace Magazin2.ViewModels
             //start with Admin 
             PasswordBox psBox = new PasswordBox();
             psBox.Password = "parola123";
-            LoginVm.UserName = "casier123";
+            LoginVm.UserName = "casier1";
             Login(psBox);
         }
         public RelayCommand LoginCommand => new RelayCommand(Login);
         private void Login(object parameter)
         {
             PasswordBox password = (parameter as PasswordBox);
-            Utilizator loginRet = LoginService.LoginSrv(LoginVm.UserName, password.Password);
+            Utilizator loggedUser = LoginService.LoginSrv(LoginVm.UserName, password.Password);
 
-            if(loginRet == null)
+            if(loggedUser == null)
             {
                 LoginVm.IncorectVsb = Visibility.Visible;
                 (parameter as PasswordBox).Password = string.Empty;
                 return;
             }
 
-            if (loginRet.TipUtilizator == "cashier")
+            if (loggedUser.TipUtilizator == "cashier")
             {
                 UserImg = "/assets/casier.png";
                 LogoutVsb = Visibility.Visible;
                 UserVsb = Visibility.Visible;
-                CurrentMainView = new CasierPageVM();
+                CurrentMainView = new CasierPageVM(loggedUser);
                 return;
             }
 
-            if (loginRet.TipUtilizator == "admin")
+            if (loggedUser.TipUtilizator == "admin")
             {
                 UserImg = "/assets/admin.png";
                 LogoutVsb = Visibility.Visible;
