@@ -57,6 +57,7 @@
     </ApplicationDefinition>
     <Compile Include="Converts\BonProdusProdusConverter.cs" />
     <Compile Include="Converts\BonUtilizatorConverter.cs" />
+    <Compile Include="Converts\CategorieConverter.cs" />
     <Compile Include="Converts\ProdusCategorieConverter.cs" />
     <Compile Include="Converts\ProdusProducatorConverter.cs" />
     <Compile Include="Converts\StocProdusConverter.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="ViewModels\CasierPageVM.cs" />
     <Compile Include="ViewModels\CategoriesVM.cs" />
     <Compile Include="ViewModels\ManufacturersVM.cs" />
+    <Compile Include="ViewModels\MoneyPerDayVM.cs" />
     <Compile Include="ViewModels\ProductsVM.cs" />
     <Compile Include="ViewModels\ReceiptDetailsVM.cs" />
     <Compile Include="ViewModels\ReceiptsVM.cs" />
@@ -110,6 +112,9 @@
     </Compile>
     <Compile Include="Views\ManufacturersView.xaml.cs">
       <DependentUpon>ManufacturersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MoneyPerDayView.xaml.cs">
+      <DependentUpon>MoneyPerDayView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProductsView.xaml.cs">
       <DependentUpon>ProductsView.xaml</DependentUpon>
@@ -162,6 +167,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ManufacturersView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MoneyPerDayView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -91,6 +91,13 @@ namespace Magazin2.ViewModels
                 return null;
             }
         }
+        private DateTime? _selectedDate = DateTime.Now;
+        public DateTime? SelectedDate
+        {
+            get { return _selectedDate; }
+            set { _selectedDate = value; OnPropertyChanged(); }
+        }
+        private Utilizator _selectedUser;
 
         public UsersVM()
         { 
@@ -105,6 +112,7 @@ namespace Magazin2.ViewModels
             {
                 UtilizatorList.Add(utilizator);
             }
+            _selectedUser = null;
         }
 
         private bool InputValidation()
@@ -204,6 +212,25 @@ namespace Magazin2.ViewModels
         private void Search(string sir, string tip)
         {
             UpdateGuiList(utilizatorBLL.SearchUtilizatori(sir, tip));
+        }
+
+        public RelayCommand SelectUserCommand => new RelayCommand(SelectUser);
+        private void SelectUser(object parameter)
+        {
+            _selectedUser = (parameter as Utilizator);
+        }
+        public RelayCommand TotalMoneyCommand => new RelayCommand(TotalMoney);
+        private void TotalMoney(object parameter)
+        {
+            if (_selectedUser == null) 
+            {
+                MessageBox.Show("Select a cashier first!","Info");
+                return;
+            }
+            new MoneyPerDayVM(utilizatorBLL.TotalMoneyPerDay(_selectedUser.UtilizatorID, SelectedDate),SelectedDate,_selectedUser.NumeUtilizator);
+            
+
+      
         }
 
 

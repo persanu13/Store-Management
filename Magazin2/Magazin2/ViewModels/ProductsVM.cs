@@ -1,5 +1,6 @@
 ﻿using Magazin2.Core;
 using Magazin2.Models.BusinessLogicLayer;
+using Magazin2.Models.DataAccessLayer;
 using Magazin2.Models.EntityLayer;
 using System;
 using System.Collections.Generic;
@@ -198,7 +199,10 @@ namespace Magazin2.ViewModels
             Produs produsDel = (parameter as Produs);
             MessageBoxResult confirm = MessageBox.Show($"Are you sure you want to delete {produsDel.NumeProdus} ?", "Delete Product", MessageBoxButton.YesNo);
             if (confirm == MessageBoxResult.No) return;
-            produsBLL.DeleteProdus(produsDel);
+            if (!produsBLL.DeleteProdus(produsDel))
+            {
+                MessageBox.Show($"You cannot delete because there are products that have it!", "Can't Delete");
+            };
             BackToCreate(null);
             UpdateGuiList(produsBLL.SearchProdus(SearchValue, SelectedSearchCategorie, SelectedSearchProducator));
         } 

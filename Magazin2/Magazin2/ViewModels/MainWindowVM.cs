@@ -52,8 +52,8 @@ namespace Magazin2.ViewModels
 
             //start with Admin 
             PasswordBox psBox = new PasswordBox();
-            psBox.Password = "parola123";
-            LoginVm.UserName = "casier1";
+            psBox.Password = "parola12";
+            LoginVm.UserName = "persanu13";
             Login(psBox);
         }
         public RelayCommand LoginCommand => new RelayCommand(Login);

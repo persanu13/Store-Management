@@ -158,7 +158,6 @@ namespace Magazin2.Models.DataAccessLayer
         {
             using (SqlConnection con = DbService.Connection)
             {
-                MessageBox.Show(stoc.Cantitate.ToString());
                 SqlCommand cmd = new SqlCommand("ActualizareCantitateStoc", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@stoc_id", stoc.StocID);

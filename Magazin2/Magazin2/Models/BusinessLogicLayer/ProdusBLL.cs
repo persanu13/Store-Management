@@ -33,9 +33,9 @@ namespace Magazin2.Models.BusinessLogicLayer
         {
             produsDAL.AddProdus(produs);
         }
-        public void DeleteProdus(Produs produs)
+        public bool DeleteProdus(Produs produs)
         {
-            produsDAL.DeleteProdus(produs);
+            return produsDAL.DeleteProdus(produs);
         }
         public void UpdateProdus(Produs produs)
         {

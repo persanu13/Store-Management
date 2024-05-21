@@ -158,7 +158,28 @@ namespace Magazin2.Models.DataAccessLayer
             }
         }
 
-
+        public ObservableCollection<Tuple<int, double>> TotalMoneyPerDay(int? utilizatorId,DateTime? date)
+        {
+            using (SqlConnection con = DbService.Connection)
+            {
+                SqlCommand cmd = new SqlCommand("SelectSumaTotalaZilnicaByUtilizator", con);
+                ObservableCollection<Tuple<int, double>> result = new ObservableCollection<Tuple<int, double>>();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@utilizator_id", utilizatorId);
+                cmd.Parameters.AddWithValue("@data_calendaristica", date);
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                int day = 0;
+                while (reader.Read())
+                {
+                    day++;
+                    Tuple<int, double> touple = new Tuple<int, double>(day, (double)reader[1]);
+                    result.Add(touple);
+                }
+                reader.Close();
+                return result;
+            }
+        }
 
 
 

@@ -119,7 +119,22 @@ namespace Magazin2.Models.DataAccessLayer
             }
         }
 
-
+        public double GetTotalSumByCategory(Categorie categorie)
+        {
+            using (SqlConnection con = DbService.Connection)
+            {
+                SqlCommand cmd = new SqlCommand("SelectSumaTotalaByCategory", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlParameter categorieIdParam = new SqlParameter("@categorie_id", categorie.CategorieID);
+                SqlParameter sumaTotalaParam = new SqlParameter("@total_sum", SqlDbType.Float);
+                sumaTotalaParam.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(categorieIdParam);
+                cmd.Parameters.Add(sumaTotalaParam);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                return (double)sumaTotalaParam.Value;
+            }
+        }
 
 
 

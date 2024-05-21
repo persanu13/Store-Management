@@ -505,6 +505,54 @@ BEGIN
 END;
 GO
 
+CREATE PROCEDURE SelectSumaTotalaByCategory
+    @categorie_id INT,
+    @total_sum FLOAT OUTPUT
+AS
+BEGIN
+    SET @total_sum = 0;
+    SELECT @total_sum = CAST(ISNULL(SUM(Stocuri.pret_vanzare * Stocuri.cantitate), 0)  AS FLOAT)
+    FROM Produse
+    JOIN Stocuri ON Produse.produs_id = Stocuri.produs_id
+    WHERE Produse.categorie_id = @categorie_id
+		  AND Stocuri.activ = 1;
+END;
+GO
+
+CREATE PROCEDURE SelectSumaTotalaZilnicaByUtilizator
+    @utilizator_id INT,
+    @data_calendaristica DATE
+AS
+BEGIN
+    DECLARE @prima_zi DATE;
+    DECLARE @ultima_zi DATE;
+
+    SET @prima_zi = DATEFROMPARTS(YEAR(@data_calendaristica), MONTH(@data_calendaristica), 1);
+    SET @ultima_zi = EOMONTH(@data_calendaristica);
+
+    DECLARE @zile TABLE (zi DATE);
+
+    DECLARE @zi DATE = @prima_zi;
+    WHILE @zi <= @ultima_zi
+    BEGIN
+        INSERT INTO @zile VALUES (@zi);
+        SET @zi = DATEADD(DAY, 1, @zi);
+    END
+
+    SELECT 
+        z.zi AS ziua,
+        CAST(ISNULL(SUM(b.suma_totala), 0) AS FLOAT) AS total_zi
+    FROM 
+        @zile z
+    LEFT JOIN 
+        Bonuri b ON z.zi = CAST(b.data_eliberare AS DATE) AND b.utilizator_id = @utilizator_id
+    GROUP BY 
+        z.zi
+    ORDER BY 
+        z.zi;
+END;
+GO
+
 --Proceduri Stocate Pentru Filtrari
 
 CREATE PROCEDURE FiltreazaUtilizatori
@@ -723,47 +771,290 @@ BEGIN
 END
 GO
 
---Inserti pentru teste in baza de date
+-- Agent pentru dezactivare automata stocuri expirate
 
--- Inserare date în tabelul Utilizatori
+
+--Creare Procedura Stocata pe care o utilizeaza Jobul
+
+CREATE PROCEDURE DezactiveazaStocuriExpirate
+AS
+BEGIN
+    UPDATE Stocuri
+    SET activ = 0
+    WHERE data_expirare < GETDATE() AND activ = 1;
+END;
+GO
+
+USE msdb;
+GO
+
+-- Creare Job
+EXEC dbo.sp_add_job
+    @job_name = N'DezactiveazaStocuriExpirateJob';
+GO
+
+-- Adauga pasul pentru job
+EXEC dbo.sp_add_jobstep
+    @job_name = N'DezactiveazaStocuriExpirateJob',
+    @step_name = N'Step1',
+    @subsystem = N'TSQL',
+    @command = N'EXEC Magazin2DB.dbo.DezactiveazaStocuriExpirate;',
+    @retry_attempts = 5,
+    @retry_interval = 5;
+GO
+
+-- Programeaza job-ul sa ruleze zilnic la ora 00:01
+EXEC dbo.sp_add_schedule
+    @schedule_name = N'DailySchedule',
+    @freq_type = 4,
+    @freq_interval = 1,
+    @active_start_time = 000101; -- Ora 00:01
+GO
+
+-- Ataseaza programul la job
+EXEC dbo.sp_attach_schedule
+    @job_name = N'DezactiveazaStocuriExpirateJob',
+    @schedule_name = N'DailySchedule';
+GO
+
+-- Activeaza job-ul
+EXEC dbo.sp_add_jobserver
+    @job_name = N'DezactiveazaStocuriExpirateJob';
+
+USE Magazin2DB;
+GO
+
+-- Inserti pentru teste in baza de date
+
+-- Inserare date in tabelul Utilizatori
 INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ) VALUES ('persanu13', 'parola12', 'admin', 1);
 INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ) VALUES ('casier1', 'parola123', 'cashier', 1);
-INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ) VALUES ('admin2', 'password789', 'admin', 1);
-INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ) VALUES ('cashier2', 'password101', 'cashier', 1);
+
+INSERT INTO Utilizatori (nume_utilizator, parola, tip_utilizator, activ)
+VALUES 
+('admin1', 'password1', 'admin', 1),
+('admin2', 'password2', 'admin', 1),
+('admin3', 'password3', 'admin', 1),
+('admin4', 'password4', 'admin', 1),
+('admin5', 'password5', 'admin', 1),
+('cashier1', 'password6', 'cashier', 1),
+('cashier2', 'password7', 'cashier', 1),
+('cashier3', 'password8', 'cashier', 1),
+('cashier4', 'password9', 'cashier', 1),
+('cashier5', 'password10', 'cashier', 1),
+('cashier6', 'password11', 'cashier', 1),
+('cashier7', 'password12', 'cashier', 1),
+('cashier8', 'password13', 'cashier', 1),
+('cashier9', 'password14', 'cashier', 1),
+('cashier10', 'password15', 'cashier', 1),
+('admin6', 'password16', 'admin', 1),
+('admin7', 'password17', 'admin', 1),
+('admin8', 'password18', 'admin', 1),
+('admin9', 'password19', 'admin', 1),
+('admin10', 'password20', 'admin', 1);
 
 -- Inserare date in tabelul Categorii
-INSERT INTO Categorii (nume_categorie, activ) VALUES ('Electronice', 1);
-INSERT INTO Categorii (nume_categorie, activ) VALUES ('Alimente', 1);
-INSERT INTO Categorii (nume_categorie, activ) VALUES ('Imbracaminte', 1);
+INSERT INTO Categorii (nume_categorie, activ)
+VALUES 
+('Electronics', 1),
+('Food', 1),
+('Clothing', 1),
+('Books', 1),
+('Furniture', 1),
+('Toys', 1),
+('Tools', 1),
+('Sports', 1),
+('Beauty', 1),
+('Health', 1),
+('Automotive', 1),
+('Jewelry', 1),
+('Garden', 1),
+('Pets', 1),
+('Office Supplies', 1),
+('Music', 1),
+('Movies', 1),
+('Games', 1),
+('Software', 1),
+('Shoes', 1);
 
 -- Inserare date in tabelul Producatori
-INSERT INTO Producatori (nume_producator, tara_origine, activ) VALUES ('Samsung', 'Coreea de Sud', 1);
-INSERT INTO Producatori (nume_producator, tara_origine, activ) VALUES ('Nestle', 'Elvetia', 1);
-INSERT INTO Producatori (nume_producator, tara_origine, activ) VALUES ('Nike', 'SUA', 1);
+INSERT INTO Producatori (nume_producator, tara_origine, activ)
+VALUES 
+('Apple', 'USA', 1),
+('Sony', 'Japan', 1),
+('LG', 'South Korea', 1),
+('Dell', 'USA', 1),
+('HP', 'USA', 1),
+('Asus', 'Taiwan', 1),
+('Lenovo', 'China', 1),
+('Microsoft', 'USA', 1),
+('Google', 'USA', 1),
+('Amazon', 'USA', 1),
+('Samsung', 'South Korea', 1),
+('Nestle', 'Switzerland', 1),
+('Nike', 'USA', 1),
+('Adidas', 'Germany', 1),
+('Puma', 'Germany', 1),
+('Reebok', 'USA', 1),
+('Under Armour', 'USA', 1),
+('New Balance', 'USA', 1),
+('Canon', 'Japan', 1),
+('Nikon', 'Japan', 1);
+
 
 -- Inserare date in tabelul Produse
-INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (1, 1, 'Televizor', '1234567890', 1);
-INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (2, 2, 'Ciocolata', '2345678901', 1);
-INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ) VALUES (3, 3, 'Pantofi sport', '3456789012', 1);
+INSERT INTO Produse (categorie_id, producator_id, nume_produs, cod_de_bare, activ)
+VALUES 
+(1, 1, 'iPhone', '0000000001', 1),
+(1, 2, 'PlayStation', '0000000002', 1),
+(1, 3, 'OLED TV', '0000000003', 1),
+(1, 4, 'XPS Laptop', '0000000004', 1),
+(1, 5, 'Spectre Laptop', '0000000005', 1),
+(1, 6, 'ZenBook', '0000000006', 1),
+(1, 7, 'ThinkPad', '0000000007', 1),
+(1, 8, 'Surface', '0000000008', 1),
+(1, 9, 'Pixel Phone', '0000000009', 1),
+(1, 10, 'Echo Dot', '0000000010', 1),
+(1, 11, 'Galaxy S', '0000000011', 1),
+(2, 12, 'KitKat', '0000000012', 1),
+(3, 13, 'Air Max', '0000000013', 1),
+(3, 14, 'Ultraboost', '0000000014', 1),
+(3, 15, 'Suede Classic', '0000000015', 1),
+(3, 16, 'Nano X', '0000000016', 1),
+(3, 17, 'Hovr', '0000000017', 1),
+(3, 18, 'Fresh Foam', '0000000018', 1),
+(1, 19, 'EOS Camera', '0000000019', 1),
+(1, 20, 'D5600 Camera', '0000000020', 1);
 
 -- Inserare date in tabelul Stocuri
-INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pret_achizitie, pret_vanzare, activ) 
-VALUES (1, 50, '2024-01-01', '2025-01-01', 1000.00, 1500.00, 1);
-INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pret_achizitie, pret_vanzare, activ) 
-VALUES (2, 200, '2024-02-01', '2025-02-01', 2.00, 3.00, 1);
-INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pret_achizitie, pret_vanzare, activ) 
-VALUES (3, 100, '2024-03-01', '2025-03-01', 50.00, 100.00, 1);
+INSERT INTO Stocuri (produs_id, cantitate, data_aprovizionare, data_expirare, pret_achizitie, pret_vanzare, activ)
+VALUES 
+(1, 49, '2024-01-01', '2025-01-01', 700, 1000.3, 1),
+(2, 30, '2024-02-01', '2025-02-01', 300, 500, 1),
+(3, 20, '2024-03-01', '2025-03-01', 900, 1300, 1),
+(4, 10, '2024-04-01', '2025-04-01', 1000, 1500, 1),
+(5, 25, '2024-05-01', '2025-05-01', 1100, 1600, 1),
+(6, 35, '2024-06-01', '2025-06-01', 1200, 1700, 1),
+(7, 40, '2024-07-01', '2025-07-01', 1300, 1800, 1),
+(8, 50, '2024-08-01', '2025-08-01', 1400, 1900, 1),
+(9, 60, '2024-09-01', '2025-09-01', 1500, 2000, 1),
+(10, 70, '2024-10-01', '2025-10-01', 1600, 2100, 1),
+(11, 80, '2024-11-01', '2025-11-01', 1700, 2200, 1),
+(12, 90, '2024-12-01', '2025-12-01', 1.5, 2.5, 1),
+(13, 100, '2025-01-01', '2026-01-01', 100, 150, 1),
+(14, 110, '2025-02-01', '2026-02-01', 120, 180, 1),
+(15, 120, '2025-03-01', '2026-03-01', 130, 190, 1),
+(16, 130, '2025-04-01', '2026-04-01', 140, 200, 1),
+(17, 140, '2025-05-01', '2026-05-01', 150, 210, 1),
+(18, 150, '2025-06-01', '2026-06-01', 160, 220, 1),
+(19, 160, '2025-07-01', '2026-07-01', 1700, 2300, 1),
+(20, 170, '2025-08-01', '2026-08-01', 1800, 2400, 1);
 
 -- Inserare date in tabelul Bonuri
-INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_totala, activ) 
-VALUES (1, 1001, '2024-04-01', 1500.00, 1);
-INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_totala, activ) 
-VALUES (2, 1002, '2024-05-01', 600.00, 1);
-INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_totala, activ) 
-VALUES (3, 1003, '2024-06-01', 5000.00, 1);
+INSERT INTO Bonuri (utilizator_id, numar_bon, data_eliberare, suma_totala, activ)
+VALUES 
+(1, 1001, '2024-01-01', 1500, 1),
+(2, 1002, '2024-02-01', 2000, 1),
+(3, 1003, '2024-03-01', 2500, 1),
+(4, 1004, '2024-04-01', 3000, 1),
+(5, 1005, '2024-05-01', 3500, 1),
+(6, 1006, '2024-06-01', 4000, 1),
+(7, 1007, '2024-07-01', 4500, 1),
+(8, 1008, '2024-08-01', 5000, 1),
+(9, 1009, '2024-09-01', 5500, 1),
+(10, 1010, '2024-10-01', 6000, 1),
+(11, 1011, '2024-11-01', 6500, 1),
+(12, 1012, '2024-12-01', 7000, 1),
+(13, 1013, '2025-01-01', 7500, 1),
+(14, 1014, '2025-02-01', 8000, 1),
+(15, 1015, '2025-03-01', 8500, 1),
+(16, 1016, '2025-04-01', 9000, 1),
+(17, 1017, '2025-05-01', 9500, 1),
+(18, 1018, '2025-06-01', 10000, 1),
+(19, 1019, '2025-07-01', 10500, 1),
+(20, 1020, '2025-08-01', 11000, 1);
 
 -- Inserare date in tabelul BonProdus
-INSERT INTO BonProdus (bon_id, produs_id, cantitate, subtotal) VALUES (1, 1, 1, 1500.00);
-INSERT INTO BonProdus (bon_id, produs_id, cantitate, subtotal) VALUES (2, 2, 200, 600.00);
-INSERT INTO BonProdus (bon_id, produs_id, cantitate, subtotal) VALUES (3, 3, 50, 5000.00);
 
+INSERT INTO BonProdus (bon_id, produs_id, cantitate, subtotal)
+VALUES 
+(1, 1, 1, 1000),
+(2, 2, 2, 1000),
+(3, 3, 1, 1300),
+(4, 4, 1, 1500),
+(5, 5, 1, 1600),
+(6, 6, 1, 1700),
+(7, 7, 1, 1800),
+(8, 8, 1, 1900),
+(9, 9, 1, 2000),
+(10, 10, 1, 2100),
+(11, 11, 1, 2200),
+(12, 12, 2, 5),
+(13, 13, 1, 150),
+(14, 14, 1, 180),
+(15, 15, 1, 190),
+(16, 16, 1, 200),
+(17, 17, 1, 210),
+(18, 18, 1, 220),
+(19, 19, 1, 2300),
+(20, 20, 1, 2400),
+(1, 2, 3, 1500),
+(2, 3, 2, 2600),
+(3, 4, 1, 1500),
+(4, 5, 1, 1600),
+(5, 6, 2, 3400),
+(6, 7, 2, 3600),
+(7, 8, 2, 3800),
+(8, 9, 1, 2000),
+(9, 10, 1, 2100),
+(10, 11, 1, 2200),
+(11, 12, 2, 5),
+(12, 13, 1, 150),
+(13, 14, 1, 180),
+(14, 15, 1, 190),
+(15, 16, 1, 200),
+(16, 17, 1, 210),
+(17, 18, 1, 220),
+(18, 19, 1, 2300),
+(19, 20, 1, 2400),
+(20, 1, 2, 2000),
+(1, 3, 2, 2600),
+(2, 4, 1, 1500),
+(3, 5, 1, 1600),
+(4, 6, 2, 3400),
+(5, 7, 2, 3600),
+(6, 8, 2, 3800),
+(7, 9, 1, 2000),
+(8, 10, 1, 2100),
+(9, 11, 1, 2200),
+(10, 12, 2, 5),
+(11, 13, 1, 150),
+(12, 14, 1, 180),
+(13, 15, 1, 190),
+(14, 16, 1, 200),
+(15, 17, 1, 210),
+(16, 18, 1, 220),
+(17, 19, 1, 2300),
+(18, 20, 1, 2400),
+(19, 1, 2, 2000),
+(20, 2, 3, 3000),
+(10, 9, 2, 2600),
+(10, 18, 1, 1500),
+(10, 19, 1, 1600),
+(5, 16, 2, 3400),
+(6, 14, 2, 3600),
+(7, 15, 2, 3800),
+(8, 16, 1, 2000),
+(9, 17, 1, 2100),
+(13, 18, 1, 2200),
+(15, 19, 2, 5),
+(16, 20, 1, 150),
+(15, 13, 1, 180),
+(18, 14, 1, 190),
+(2, 15, 1, 200),
+(6, 16, 1, 210),
+(7, 17, 1, 220),
+(20, 18, 1, 2300),
+(6, 19, 1, 2400),
+(16, 2, 2, 2000),
+(5, 3, 3, 3000);

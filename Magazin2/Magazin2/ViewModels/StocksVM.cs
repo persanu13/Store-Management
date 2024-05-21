@@ -103,7 +103,7 @@ namespace Magazin2.ViewModels
                 WrongMessage = "Produs is not selected!";
                 return false;
             }
-            if (_quantity == 0)
+            if (_quantity < 1)
             {
                 WrongMessage = "Quantity is 0!";
                 return false;
@@ -118,7 +118,7 @@ namespace Magazin2.ViewModels
                 WrongMessage = "Expiration date cannot be older or same than the supply date!";
                 return false;
             }
-            if (_purchasePrice == 0)
+            if (_purchasePrice < 1)
             {
                 WrongMessage = "Purchase price is 0!";
                 return false;

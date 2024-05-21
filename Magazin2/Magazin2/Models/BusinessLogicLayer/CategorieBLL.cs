@@ -38,5 +38,11 @@ namespace Magazin2.Models.BusinessLogicLayer
         {
             return categorieDAL.CategoryExist(categorieName);
         }
+        public double GetTotalSumByCategory(Categorie categorie)
+        {
+            return categorieDAL.GetTotalSumByCategory(categorie);
+        }
+
+
     }
 }

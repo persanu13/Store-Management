@@ -43,5 +43,12 @@ namespace Magazin2.Models.BusinessLogicLayer
         {
             return utilizatorDAL.UserPasswordExist(password);
         }
+        public ObservableCollection<Tuple<int, double>> TotalMoneyPerDay(int? utilizatorId, DateTime? date)
+        {
+            return utilizatorDAL.TotalMoneyPerDay(utilizatorId, date);
+        }
+
+
+
     }
 }
