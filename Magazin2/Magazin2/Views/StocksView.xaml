@@ -14,7 +14,7 @@
     <Canvas>
         <DockPanel Canvas.Left="10" Canvas.Top="30">
             <ComboBox Height="25" ItemsSource="{Binding AllProduse, Mode=OneTime}" FontSize="12" FontWeight="Medium"
-                      FontFamily="/assets/fonts/#Inter" Width="150" Margin="10 0" VerticalContentAlignment="Center"
+                      FontFamily="/assets/fonts/#Inter" Width="150" Margin="0 0" VerticalContentAlignment="Center"
                       SelectedItem="{Binding SelectedSearchProdus}" DisplayMemberPath="NumeProdus"/>
         </DockPanel>
 

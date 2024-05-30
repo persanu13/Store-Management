@@ -14,7 +14,7 @@
                Margin="0 0 0 10"/>
         <TextBlock  FontSize="12" FontWeight="Medium" FontFamily="/assets/fonts/#Inter" Margin="0 2">
         <Run Text="Selected month: "/>
-        <Run Text="{Binding Date}"/>
+        <Run Text="{Binding Date ,StringFormat={}{0:yyyy-MM}}"/>
         </TextBlock>
         <TextBlock  FontSize="12" FontWeight="Medium" FontFamily="/assets/fonts/#Inter" Margin="0 2">
      <Run Text="Cashie name: "/>

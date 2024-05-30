@@ -49,12 +49,6 @@ namespace Magazin2.ViewModels
             UserVsb = Visibility.Hidden;
             UserImg = "/assets/admin.png";
             CurrentMainView = LoginVm;
-
-            //start with Admin 
-            PasswordBox psBox = new PasswordBox();
-            psBox.Password = "parola12";
-            LoginVm.UserName = "persanu13";
-            Login(psBox);
         }
         public RelayCommand LoginCommand => new RelayCommand(Login);
         private void Login(object parameter)
