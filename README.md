@@ -26,6 +26,8 @@ The project is a desktop application designed to manage a store, allowing two ty
 ## User Interface
 
 ### Login Window
+![image](https://github.com/persanu13/Store-Management/assets/86602112/bd3f857e-07ff-4e1d-9972-297afebbcd9d)
+
 - Fields for username and password.
 - Login button.
 
