@@ -26,22 +26,32 @@ The project is a desktop application designed to manage a store, allowing two ty
 ## User Interface
 
 ### Login Window
+
 ![image](https://github.com/persanu13/Store-Management/assets/86602112/bd3f857e-07ff-4e1d-9972-297afebbcd9d)
 
 - Fields for username and password.
 - Login button.
 
 ### Admin Dashboard
+
+![image](https://github.com/persanu13/Store-Management/assets/86602112/9cff2b63-e736-412b-bf22-e55c0a3c57d3)
+
 - Navigation menu to access different tables (Products, Customers, Sales, Users).
 - Data grids to display table contents.
 - Forms to add, edit, and delete records.
 - Buttons to generate reports.
 
 ### Cashier Dashboard
+
+![image](https://github.com/persanu13/Store-Management/assets/86602112/6ef53fdc-ff23-4262-86cd-36d983380f56)
+
 - Form to create new receipts with fields for customer selection, product selection, quantity, and price.
 - Data grid to display created receipts.
 
+
 ## Implementation Details
+
+
 
 - **WPF**: Used for creating the user interface with XAML for designing windows and controls.
 - **Entity Framework**: Used for database operations, providing an ORM to interact with SQL Server.
